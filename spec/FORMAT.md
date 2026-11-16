@@ -54,7 +54,7 @@ its profile.
 | `step` | full | Integer in 0..1000, the reveal step inside a frame; 0 is shown from the start |
 | `enter` | full | String of at most 64 characters, an animation preset name |
 | `start`, `duration` | full | Number in 0..86400, seconds from the frame's start |
-| `track` | full | Integer in 0..64. Two timed shapes on one track MUST NOT overlap in time |
+| `track` | full | Integer in 0..64. The operations refuse two timed shapes of one frame that overlap in time on one track; the validator does not, so a live drag may pass through |
 | `fit` | full | `"cover"`, `"contain"` or `"fill"` |
 | `opacity` | full | Number in 0..1 |
 
