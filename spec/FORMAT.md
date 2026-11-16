@@ -156,15 +156,16 @@ buy milk
 
 ### 2.2 Attributes
 
-Attributes are `key="value"`, separated by one space, with `\"` and `\\` as the only escapes, as
-encre FORMAT 2.1. The key alone says how the value reads:
+Attributes are `key="value"`, separated by one space, as encre FORMAT 2.1, with three escapes:
+`\"`, `\\` and `\n` (a line feed). A value never spans lines. The key alone says how the value
+reads:
 
 | Value | Written as |
 |---|---|
 | Number | Shortest decimal that reads back to the same 64-bit float, no exponent, `-0` written `0` |
 | String | Verbatim, escaped |
 | Boolean | `true` or `false` |
-| Style | One attribute per field: `style.fill="#fff"`, `style.width="2"` |
+| Style | One attribute per field: `style.fill="#fff"`, `style.width="2"`. An empty style object is `style=""` |
 | Points | Numbers separated by one space |
 | Binding | `<shape id> <anchor x> <anchor y>`, separated by one space |
 
