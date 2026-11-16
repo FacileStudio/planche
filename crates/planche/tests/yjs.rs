@@ -1,7 +1,7 @@
 use std::collections::{BTreeMap, HashMap};
 
-use planche::yjs::{apply, read, write};
-use planche::{Binding, Document, Edit, Meta, Rich, SHAPES, Shape, Style, Value};
+use planche::yjs::{apply, read, validate, write};
+use planche::{Binding, Document, Edit, Meta, Profile, Rich, SHAPES, Shape, Style, Value};
 use yrs::{Any, Doc, Map, MapPrelim, TextPrelim, Transact};
 
 fn shape(kind: &str, fields: Vec<(&str, Value)>) -> Shape {
@@ -20,15 +20,19 @@ fn everything() -> Document {
     };
     let binding = Binding { shape: "s".into(), anchor: [0.5, 1.0] };
     let rich = Value::Rich(Rich(encre::markdown::parse("# Hi\n\nthere").expect("md")));
-    let text = vec![("x", Value::Number(0.0)), ("style", Value::Style(style)), ("text", rich)];
-    let arrow = vec![
-        ("points", Value::Points(vec![0.0, 0.0, 10.0, -4.25])),
-        ("from", Value::Binding(binding)),
-        ("z", Value::Str("a0".into())),
-        ("locked", Value::Bool(true)),
-    ];
+    let text =
+        vec![("x", Value::Number(0.0)), ("y", Value::Number(0.0)), ("style", Value::Style(style)), ("text", rich)];
+    let line = vec![("points", Value::Points(vec![0.0, 0.0, 10.0, -4.25])), ("from", Value::Binding(binding))];
+    let flags = vec![("z", Value::Str("a0".into())), ("locked", Value::Bool(true))];
+    let arrow = [vec![("x", Value::Number(0.0)), ("y", Value::Number(0.0))], line, flags].concat();
     let shapes = BTreeMap::from([
-        ("s".to_owned(), shape("sticky", vec![("x", Value::Number(1.5)), ("text", Value::Plain("hey".into()))])),
+        (
+            "s".to_owned(),
+            shape(
+                "sticky",
+                vec![("x", Value::Number(1.5)), ("y", Value::Number(0.0)), ("text", Value::Plain("hey".into()))],
+            ),
+        ),
         ("t".to_owned(), shape("text", text)),
         ("a".to_owned(), shape("arrow", arrow)),
     ]);
@@ -45,6 +49,8 @@ fn edited(edits: &[Edit]) -> Result<Document, planche::yjs::ReadError> {
 fn write_then_read_round_trips_every_value() {
     let document = everything();
     assert_eq!(read(&write(&document)).expect("read"), document);
+    assert_eq!(validate(&document, Profile::Full), Ok(()));
+    assert!(validate(&document, Profile::Board).is_err());
 }
 
 #[test]
