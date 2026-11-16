@@ -6,6 +6,8 @@ use super::scan::Raw;
 use super::{ProjectionError, fail, scalars};
 use crate::{Profile, Rule, Style, Value};
 
+const MIXED: &str = "style=\"\" is the empty style; drop it or the style.<field> attributes";
+
 /// How the `text` attribute says the body reads.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Text {
@@ -26,11 +28,12 @@ pub struct Attrs {
     /// How the body reads.
     pub text: Text,
     style: Option<Style>,
+    bare: bool,
 }
 
 /// Reads the attributes of `raw`, a block of a type `profile` allows.
 pub fn attrs(raw: &Raw, profile: Profile) -> Result<Attrs, ProjectionError> {
-    let mut out = Attrs { id: None, fields: BTreeMap::new(), text: Text::Rich, style: None };
+    let mut out = Attrs { id: None, fields: BTreeMap::new(), text: Text::Rich, style: None, bare: false };
     let mut seen = HashSet::new();
     for (key, value) in &raw.attrs {
         if !seen.insert(key.as_str()) {
@@ -52,13 +55,16 @@ fn one(kind: &str, key: &str, value: &str, profile: Profile, out: &mut Attrs) ->
     if let Some(field) = key.strip_prefix("style.")
         && profile.rule(kind, "style").is_some()
     {
+        if out.bare {
+            return Err(MIXED.to_owned());
+        }
         return style(field, value, out.style.get_or_insert_with(Style::default));
     }
     match profile.rule(kind, key) {
         None => Err(unknown(kind, key, profile)),
         Some(Rule::Plain | Rule::Text) => text(value, out),
         Some(Rule::Rich) => Err(format!("{key} is not an attribute; write it as a ```{key} fence first in the frame")),
-        Some(Rule::Style) => Err("write style as style.<field> attributes, for example style.fill=\"#fff\"".to_owned()),
+        Some(Rule::Style) => bare(value, out),
         Some(_) if key == "html" => Err("html is not an attribute; write it as the block body".to_owned()),
         Some(rule) => {
             out.fields.insert(key.to_owned(), read(rule, value)?);
@@ -76,6 +82,20 @@ fn unknown(kind: &str, key: &str, profile: Profile) -> String {
         .map(|(name, _)| if name == "style" { "style.<field>".to_owned() } else { name.to_owned() })
         .collect();
     format!("a {kind} has no attribute {key}; allowed: id, {}", allowed.join(", "))
+}
+
+fn bare(value: &str, out: &mut Attrs) -> Result<(), String> {
+    if !value.is_empty() {
+        return Err(
+            "style=\"\" is the empty style; write fields as style.<field>, for example style.fill=\"#fff\"".into()
+        );
+    }
+    if out.style.is_some() {
+        return Err(MIXED.to_owned());
+    }
+    out.style = Some(Style::default());
+    out.bare = true;
+    Ok(())
 }
 
 fn text(value: &str, out: &mut Attrs) -> Result<(), String> {

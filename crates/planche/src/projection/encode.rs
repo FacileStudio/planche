@@ -51,6 +51,7 @@ fn attr(key: &str, value: &Value, out: &mut String) {
         Value::Binding(b) => {
             push(out, key, &format!("{} {} {}", b.shape, number(b.anchor[0]), number(b.anchor[1])));
         }
+        Value::Style(style) if *style == Style::default() => push(out, key, ""),
         Value::Style(style) => styles(style, out),
         Value::Plain(_) | Value::Rich(_) => {}
     }

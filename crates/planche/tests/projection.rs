@@ -90,7 +90,7 @@ fn every_variant() -> Document {
             "r 1",
             shape("rect", vec![("text", Value::Plain("line one\n\n```\ncode\n```".into())), ("parent", s("gone"))]),
         ),
-        ("e1", shape("ellipse", vec![])),
+        ("e1", shape("ellipse", vec![("style", Value::Style(Style::default()))])),
         ("d1", shape("diamond", vec![("text", rich(""))])),
         ("k1", shape("sticky", vec![("text", Value::Plain(String::new()))])),
         (
@@ -195,6 +195,9 @@ fn the_reader_refuses_with_the_line_number() {
         ),
         ("```rect id=\"a\" x=\"0\" y=\"0\"\n```\n\n```rect id=\"b\" x=\"0\" y=\"0\" opacity=\"2\"\n```\n", 8, ""),
         ("```rect id=\"a\" x=\"0\" y=\"0\"\nhi\n", 5, "never closed"),
+        ("```frame id=\"a\" x=\"0\" y=\"0\" name=\"one\ntwo\"\n```\n", 5, "not closed on its line"),
+        ("```rect id=\"a\" x=\"0\" y=\"0\" style=\"\" style.fill=\"red\"\n```\n", 5, "empty style"),
+        ("```rect id=\"a\" x=\"0\" y=\"0\" style.fill=\"red\" style=\"\"\n```\n", 5, "empty style"),
     ];
     for (body, line, words) in cases {
         let (at, message) = refused(&format!("{head}{body}"));
@@ -228,7 +231,7 @@ fn quotes_backslashes_and_newlines_in_strings_round_trip() {
     let name = s("a \"quoted\" \\ name\nsecond line ``` x=\"y\"");
     document.shapes.insert("q\"\\".into(), shape("frame", vec![("name", name)]));
     let text = write(&document);
-    assert!(text.contains(r#"name="a \"quoted\" \\ name"#), "{text}");
+    assert!(text.contains(r#"name="a \"quoted\" \\ name\nsecond line"#), "{text}");
     assert_eq!(read(&text, Profile::Full).unwrap(), document);
 }
 
@@ -270,8 +273,7 @@ fn plain_shape() -> impl Strategy<Value = Shape> {
         proptest::collection::vec(number, 0..8),
     )
         .prop_map(|(x, y, z, locked, style, points)| {
-            let mut fields = vec![("x", n(x)), ("y", n(y))];
-            fields.extend((style != Style::default()).then_some(("style", Value::Style(style))));
+            let mut fields = vec![("x", n(x)), ("y", n(y)), ("style", Value::Style(style))];
             fields.extend(z.map(|z| ("z", s(&z))));
             fields.extend(locked.map(|b| ("locked", Value::Bool(b))));
             let points: Vec<f64> = points.iter().copied().take(points.len() / 2 * 2).collect();

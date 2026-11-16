@@ -44,13 +44,14 @@ fn block<'a>(lines: &'a [&'a str], i: usize, first: usize) -> Result<(Raw<'a>, u
     if n < 3 {
         return Err(fail(line, "only fenced shape blocks and blank lines go here; open a block with ```<type>"));
     }
-    let (info, last) = info(lines, i);
-    if attrs::open(&info) {
-        return Err(fail(line, "an attribute value opened here is never closed with `\"`"));
+    let info = &lines[i][n..];
+    let last = i;
+    if attrs::open(info) {
+        return Err(fail(line, "an attribute value is not closed on its line; write a line break as \\n"));
     }
     let end = closing(lines, last + 1, n)
         .ok_or_else(|| fail(line, format!("the fence opened here is never closed by a line of {n} backticks")))?;
-    let (kind, rest) = info.split_once(' ').unwrap_or((&info, ""));
+    let (kind, rest) = info.split_once(' ').unwrap_or((info, ""));
     let kind = kind.trim_end_matches('\r');
     if kind.is_empty() {
         return Err(fail(line, "name the shape type right after the fence, for example ```rect"));
@@ -62,17 +63,6 @@ fn block<'a>(lines: &'a [&'a str], i: usize, first: usize) -> Result<(Raw<'a>, u
 
 fn ticks(line: &str) -> usize {
     line.bytes().take_while(|b| *b == b'`').count()
-}
-
-fn info(lines: &[&str], i: usize) -> (String, usize) {
-    let mut info = lines[i][ticks(lines[i])..].to_owned();
-    let mut at = i;
-    while attrs::open(&info) && at + 1 < lines.len() {
-        at += 1;
-        info.push('\n');
-        info.push_str(lines[at]);
-    }
-    (info, at)
 }
 
 fn closing(lines: &[&str], from: usize, n: usize) -> Option<usize> {
