@@ -83,13 +83,13 @@ pub struct Binding {
     pub anchor: [f64; 2],
 }
 
-/// An encre document; two compare equal when they match without their block ids.
+/// An encre document; two compare equal when their compact forms match without their block ids.
 #[derive(Debug, Clone)]
 pub struct Rich(pub encre::Node);
 
 impl PartialEq for Rich {
     fn eq(&self, other: &Self) -> bool {
-        self.0.without_ids() == other.0.without_ids()
+        encre::compact(&self.0.without_ids()) == encre::compact(&other.0.without_ids())
     }
 }
 
