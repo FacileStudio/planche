@@ -1,0 +1,13 @@
+[tools]
+lefthook = "latest"
+
+[hooks]
+postinstall = "lefthook install"
+
+[tasks.check]
+description = "Run the full quality gate: rustfmt, clippy, the Rust tests, filet"
+run = "sh ./scripts/check.sh"
+
+[tasks.test]
+description = "Run the Rust tests only"
+run = "cargo test --locked"

@@ -1,0 +1,11 @@
+# planche: the Facile canvas document format, its Rust crate and its spec.
+
+kind: lib
+
+ignore: [.git, target, node_modules, dist, build, coverage]
+extensions: [.rs, .ts, .sh]
+
+disabled:
+  - gen.line.long   # rustfmt owns line width (rustfmt.toml sets 120)
+
+failOn: error
