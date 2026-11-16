@@ -31,10 +31,7 @@ pub fn pairs(mut rest: &str) -> Result<Vec<(String, String)>, String> {
             return Ok(pairs);
         }
         let eq = rest.find('=').ok_or_else(|| format!("expected key=\"value\" at `{}`", first_word(rest)))?;
-        let key = &rest[..eq];
-        if key.is_empty() || !key.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '.') {
-            return Err(format!("`{key}` is not an attribute name"));
-        }
+        let key = name(&rest[..eq])?;
         let (value, after) = value(&rest[eq + 1..]).ok_or_else(|| {
             format!("the value of {key} goes in double quotes, with \\\" and \\\\ as the only escapes")
         })?;
@@ -58,6 +55,11 @@ fn value(rest: &str) -> Option<(String, &str)> {
         }
     }
     None
+}
+
+fn name(key: &str) -> Result<&str, String> {
+    let ok = !key.is_empty() && key.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '.');
+    if ok { Ok(key) } else { Err(format!("`{key}` is not an attribute name")) }
 }
 
 fn first_word(rest: &str) -> &str {
