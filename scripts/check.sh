@@ -4,7 +4,7 @@
 #
 #   sh scripts/check.sh
 #
-# Runs rustfmt, clippy and the Rust tests, then filet. It first refuses a local dependency
+# Runs rustfmt, clippy and the Rust tests, then the TypeScript check and tests, then filet. It first refuses a local dependency
 # (`path =` or a `file://` git source): a tag built that way only builds here.
 
 set -eu
@@ -20,6 +20,11 @@ echo "==> crates/planche"
 cargo fmt --all --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo test --workspace --locked
+
+echo "==> src/lib"
+[ -d node_modules ] || bun install --frozen-lockfile >/dev/null
+bun run check
+bun run test
 
 echo "==> filet"
 if command -v filet >/dev/null 2>&1; then
