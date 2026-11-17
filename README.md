@@ -15,11 +15,11 @@ Shapes on a canvas in a Yjs document, with frames as slides or scenes, and encre
 ## Install
 
 ```toml
-planche = { git = "https://github.com/FacileStudio/planche", tag = "v0.2.0" }
+planche = { git = "https://github.com/FacileStudio/planche", tag = "v0.3.1" }
 ```
 
 ```json
-"@facile/planche": "github:FacileStudio/planche#v0.2.0"
+"@facile/planche": "github:FacileStudio/planche#v0.3.1"
 ```
 
 ## Develop

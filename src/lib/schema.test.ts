@@ -33,11 +33,11 @@ describe('profiles', () => {
 		expect(allowedKey('rect', 'opacity', 'full')).toBe(true);
 	});
 
-	it('allow type on every shape and never a head on a line', () => {
+	it('allow type on every shape and a head on lines and arrows, as the spec says', () => {
 		expect(allowedKey('sticky', 'type')).toBe(true);
 		expect(allowedKey('arrow', 'head')).toBe(true);
-		expect(allowedKey('line', 'head')).toBe(false);
-		expect(allowedKey('line', 'head', 'full')).toBe(false);
+		expect(allowedKey('line', 'head')).toBe(true);
+		expect(allowedKey('line', 'head', 'full')).toBe(true);
 	});
 });
 

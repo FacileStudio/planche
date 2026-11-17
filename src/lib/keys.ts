@@ -65,9 +65,8 @@ export function keys(type: string, profile: Profile = 'board'): readonly string[
 	return TABLES[profile].get(type);
 }
 
-/** Whether `key` is allowed on a shape of `type`. This client never writes a `head` on a `line`, which draws none. */
+/** Whether `key` is allowed on a shape of `type` under `profile` (board by default), as spec sections 1.4 and 1.5 say. */
 export function allowedKey(type: FullType, key: string, profile: Profile = 'board'): boolean {
-	if (type === 'line' && key === 'head') return false;
 	return key === 'type' || (keys(type, profile)?.includes(key) ?? false);
 }
 

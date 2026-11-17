@@ -2,7 +2,8 @@
 
 Normative. planche is the Facile canvas document: a Toile board, a Diapo deck, a Clap
 video. When an implementation and this page disagree, the implementation is wrong. A change
-to this page that changes what a valid document is, is a schema version bump (section 1.8).
+to this page that refuses or reinterprets a document valid before is a schema version bump
+(section 1.8).
 
 The key words MUST, MUST NOT and MAY are used as in RFC 2119.
 
@@ -53,7 +54,7 @@ its profile.
 | `rot` | board | Number, radians around the box centre |
 | `z` | board | String, a fractional index; paint order among siblings, lowest first |
 | `parent` | board | String, the id of the frame that holds this shape. It MAY name a missing shape |
-| `style` | board | Plain object with any of `fill`, `stroke`, `font`, `align` (strings) and `width`, `size` (numbers). `align` reads as `"left"`, `"center"` or `"right"`, and in `full` also `"justify"`. In `full` only, also `valign`: `"top"`, `"middle"` or `"bottom"`, where the text sits in the shape's box; absent is top |
+| `style` | board | Plain object with any of `fill`, `stroke`, `font`, `align` (strings) and `width`, `size` (numbers). `align` reads as `"left"`, `"center"` or `"right"`, and in `full` also `"justify"`. In `full` only, also `valign`: `"top"`, `"middle"` or `"bottom"`, where the text sits in the shape's box; absent is `middle` for `rect`, `ellipse` and `diamond` and `top` for every other type |
 | `locked` | board | Boolean |
 | `step` | full | Integer in 0..1000, the reveal step inside a frame; 0 is shown from the start |
 | `enter` | full | String of at most 64 characters, an animation preset name |
@@ -117,6 +118,11 @@ Unknown roots, types and keys are refused.
 `meta.schema` names the version. A later version ships a migration function from the one
 before, run on load, never a silent reinterpretation. Toile board schema 1 is planche schema 1
 with the `board` profile, so moving a Toile board to planche is the identity.
+
+A change that only widens what a profile accepts, so that every document valid before keeps
+its meaning and needs no migration, keeps the version. planche v0.3.0 (`style.valign` and
+`justify` under `full`) is such a change. Any change that refuses a document valid before, or
+reads one differently, is a new version.
 
 ## 2. Text projection
 

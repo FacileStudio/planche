@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-11-17
+
+### Fixed
+
+- TypeScript `allowedKey` allows `head` on a `line`, as the spec and the Rust validator always did.
+- The spec gives the `valign` default per type: `middle` for `rect`, `ellipse` and `diamond`, `top` for the rest, as Diapo draws them.
+- The spec says when a schema change needs a new version: only when it refuses or reinterprets a document valid before.
+
 ## [0.3.0] - 2026-11-17
 
 ### Added
