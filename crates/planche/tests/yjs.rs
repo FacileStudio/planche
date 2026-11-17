@@ -17,6 +17,7 @@ fn everything() -> Document {
         font: Some("sans".into()),
         size: Some(14.5),
         align: Some("left".into()),
+        valign: Some("bottom".into()),
     };
     let binding = Binding { shape: "s".into(), anchor: [0.5, 1.0] };
     let rich = Value::Rich(Rich(encre::markdown::parse("# Hi\n\nthere").expect("md")));

@@ -20,7 +20,8 @@ fn common() -> Vec<(&'static str, Value)> {
         width: Some(2.5),
         font: Some("Magnetik".into()),
         size: Some(64.0),
-        align: Some("center".into()),
+        align: Some("justify".into()),
+        valign: Some("middle".into()),
     };
     vec![
         ("w", n(100.0)),

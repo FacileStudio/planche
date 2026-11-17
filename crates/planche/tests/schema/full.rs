@@ -1,5 +1,7 @@
 //! What [`Profile::Full`] adds, and that [`Profile::Board`] still refuses it.
 
+use std::collections::HashMap;
+
 use planche::doc::{from_state, new_doc, seed};
 use planche::schema::check_all;
 use planche::{META, Profile};
@@ -83,5 +85,22 @@ fn meta_size_is_full_only_and_well_formed() {
     assert!(check_all(&sized("1920x1080"), Profile::Board).unwrap_err().contains("unknown key size"));
     for bad in ["0x1080", "1920x16385", "1920", "1920x1080x1", "01920x1080", "1920.5x1080", "x"] {
         assert!(check_all(&sized(bad), Profile::Full).unwrap_err().contains("meta.size"), "{bad}");
+    }
+}
+
+#[test]
+fn valign_and_justify_are_full_only_style() {
+    let styled = |fields: Vec<(&str, Any)>| {
+        let style: HashMap<String, Any> = fields.into_iter().map(|(k, v)| (k.to_owned(), v)).collect();
+        shape("text", vec![("style", Any::from(style))])
+    };
+    for valign in ["top", "middle", "bottom"] {
+        let doc = styled(vec![("valign", valign.into()), ("align", "justify".into())]);
+        assert_eq!(check_all(&doc, Profile::Full), Ok(()));
+        assert!(check_all(&doc, Profile::Board).unwrap_err().contains("unknown key valign"));
+    }
+    for bad in [Any::from("center"), Any::from("Top"), Any::from(1.0)] {
+        let error = check_all(&styled(vec![("valign", bad)]), Profile::Full).unwrap_err();
+        assert!(error.contains("valign must be one of top, middle, bottom"), "{error}");
     }
 }

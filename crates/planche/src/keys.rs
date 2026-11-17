@@ -25,8 +25,8 @@ pub enum Rule {
     Choice(&'static [&'static str]),
     /// `true` or `false`.
     Bool,
-    /// The `style` object.
-    Style,
+    /// The `style` object, with the fields this profile allows.
+    Style(Profile),
     /// A flat number array of this stride.
     Points(usize),
     /// `{ shape, anchor }`.
@@ -52,7 +52,7 @@ const COMMON: &[(&str, Rule)] = &[
     ("rot", Rule::Number),
     ("z", STR),
     ("parent", STR),
-    ("style", Rule::Style),
+    ("style", Rule::Style(Profile::Board)),
     ("locked", Rule::Bool),
 ];
 const COMMON_FULL: &[(&str, Rule)] = &[
@@ -113,7 +113,7 @@ impl Profile {
         let extra = extra(self, kind)?;
         let common = match self {
             Profile::Board => COMMON.to_vec(),
-            Profile::Full => [COMMON, COMMON_FULL].concat(),
+            Profile::Full => [COMMON, COMMON_FULL].concat().into_iter().map(full_style).collect(),
         };
         Some(common.into_iter().chain(extra.iter().copied()).collect())
     }
@@ -121,6 +121,13 @@ impl Profile {
     /// The rule for `key` on a shape of `kind`, or `None` when this profile does not allow it.
     pub fn rule(self, kind: &str, key: &str) -> Option<Rule> {
         self.keys(kind)?.into_iter().find(|(name, _)| *name == key).map(|(_, rule)| rule)
+    }
+}
+
+fn full_style((key, rule): (&'static str, Rule)) -> (&'static str, Rule) {
+    match rule {
+        Rule::Style(_) => (key, Rule::Style(Profile::Full)),
+        _ => (key, rule),
     }
 }
 

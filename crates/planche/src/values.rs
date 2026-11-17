@@ -65,7 +65,7 @@ pub(crate) fn check<T: ReadTxn>(txn: &T, rule: Rule, value: &Out) -> Result<(), 
         Rule::Str(max) => string(plain(value)?, max),
         Rule::Choice(options) => choice(plain(value)?, options),
         Rule::Bool => matches!(plain(value)?, Any::Bool(_)).then_some(()).ok_or_else(|| "must be a boolean".to_owned()),
-        Rule::Style => compound::style(plain(value)?),
+        Rule::Style(profile) => compound::style(plain(value)?, profile),
         Rule::Points(stride) => compound::points(plain(value)?, stride),
         Rule::Binding => compound::binding(plain(value)?),
     }

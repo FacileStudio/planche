@@ -3,14 +3,17 @@
 use serde_json::{Map, Value as Json};
 
 use super::OpError;
-use crate::{Binding, Rich, Rule, Style, Value};
+use crate::{Binding, Profile, Rich, Rule, Style, Value};
 
 fn expected(rule: Rule) -> &'static str {
     match rule {
         Rule::Number | Rule::Range(..) | Rule::Int(..) => "a number",
         Rule::Str(_) | Rule::Choice(_) => "a string",
         Rule::Bool => "true or false",
-        Rule::Style => "an object of fill, stroke, font, align (strings) and width, size (numbers)",
+        Rule::Style(Profile::Board) => "an object of fill, stroke, font, align (strings) and width, size (numbers)",
+        Rule::Style(Profile::Full) => {
+            "an object of fill, stroke, font, align, valign (strings) and width, size (numbers)"
+        }
         Rule::Points(_) => "a flat array of numbers",
         Rule::Binding => "an object {shape: string, anchor: [number, number]}",
         Rule::Plain => "a plain string",
@@ -25,7 +28,7 @@ pub fn value(id: &str, key: &str, rule: Rule, json: &Json) -> Result<Value, OpEr
         (Rule::Number | Rule::Range(..) | Rule::Int(..), Json::Number(n)) => n.as_f64().map(Value::Number),
         (Rule::Str(_) | Rule::Choice(_), Json::String(s)) => Some(Value::Str(s.clone())),
         (Rule::Bool, Json::Bool(b)) => Some(Value::Bool(*b)),
-        (Rule::Style, Json::Object(map)) => style(map).map(Value::Style),
+        (Rule::Style(profile), Json::Object(map)) => style(map, profile).map(Value::Style),
         (Rule::Points(_), Json::Array(items)) => {
             items.iter().map(Json::as_f64).collect::<Option<_>>().map(Value::Points)
         }
@@ -52,10 +55,11 @@ fn field<T>(map: &Map<String, Json>, key: &str, read: impl Fn(&Json) -> Option<T
     }
 }
 
-fn style(map: &Map<String, Json>) -> Option<Style> {
+fn style(map: &Map<String, Json>, profile: Profile) -> Option<Style> {
     let text = |json: &Json| json.as_str().map(str::to_owned);
     let known = ["fill", "stroke", "width", "font", "size", "align"];
-    if map.keys().any(|k| !known.contains(&k.as_str())) {
+    let full = profile == Profile::Full;
+    if map.keys().any(|k| !known.contains(&k.as_str()) && !(full && k == "valign")) {
         return None;
     }
     Some(Style {
@@ -65,6 +69,7 @@ fn style(map: &Map<String, Json>) -> Option<Style> {
         font: field(map, "font", text)?,
         size: field(map, "size", Json::as_f64)?,
         align: field(map, "align", text)?,
+        valign: field(map, "valign", text)?,
     })
 }
 

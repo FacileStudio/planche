@@ -65,6 +65,7 @@ fn styles(style: &Style, out: &mut String) {
         ("font", style.font.clone()),
         ("size", style.size.map(number)),
         ("align", style.align.clone()),
+        ("valign", style.valign.clone()),
     ];
     for (name, value) in fields {
         if let Some(value) = value {

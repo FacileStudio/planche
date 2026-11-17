@@ -53,7 +53,7 @@ its profile.
 | `rot` | board | Number, radians around the box centre |
 | `z` | board | String, a fractional index; paint order among siblings, lowest first |
 | `parent` | board | String, the id of the frame that holds this shape. It MAY name a missing shape |
-| `style` | board | Plain object with any of `fill`, `stroke`, `font`, `align` (strings) and `width`, `size` (numbers) |
+| `style` | board | Plain object with any of `fill`, `stroke`, `font`, `align` (strings) and `width`, `size` (numbers). `align` reads as `"left"`, `"center"` or `"right"`, and in `full` also `"justify"`. In `full` only, also `valign`: `"top"`, `"middle"` or `"bottom"`, where the text sits in the shape's box; absent is top |
 | `locked` | board | Boolean |
 | `step` | full | Integer in 0..1000, the reveal step inside a frame; 0 is shown from the start |
 | `enter` | full | String of at most 64 characters, an animation preset name |
@@ -174,7 +174,7 @@ reads:
 | Binding | `<shape id> <anchor x> <anchor y>`, separated by one space |
 
 A writer writes `id` first, then the keys in the order of section 1.4 then section 1.5, then
-`style.*` in the order `fill stroke width font size align`, and leaves out `type`, `text`,
+`style.*` in the order `fill stroke width font size align valign`, and leaves out `type`, `text`,
 `notes` and `html`.
 
 ### 2.3 Bodies

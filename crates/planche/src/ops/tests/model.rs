@@ -7,10 +7,14 @@ use crate::{Edit, Profile, Rule, Value};
 #[test]
 fn json_values_follow_rules() {
     assert_eq!(json::value("a", "x", Rule::Number, &json!(3)).unwrap(), n(3.0));
-    let style = json::value("a", "style", Rule::Style, &json!({"fill": "#fff", "width": 2})).unwrap();
+    let style = json::value("a", "style", Rule::Style(Profile::Board), &json!({"fill": "#fff", "width": 2})).unwrap();
     let Value::Style(style) = style else { panic!() };
     assert_eq!((style.fill.as_deref(), style.width), (Some("#fff"), Some(2.0)));
-    assert!(json::value("a", "style", Rule::Style, &json!({"colour": "red"})).is_err());
+    assert!(json::value("a", "style", Rule::Style(Profile::Board), &json!({"colour": "red"})).is_err());
+    let valign = json!({"align": "justify", "valign": "bottom"});
+    assert!(json::value("a", "style", Rule::Style(Profile::Board), &valign).is_err());
+    let Value::Style(style) = json::value("a", "style", Rule::Style(Profile::Full), &valign).unwrap() else { panic!() };
+    assert_eq!((style.align.as_deref(), style.valign.as_deref()), (Some("justify"), Some("bottom")));
     let binding = json::value("a", "from", Rule::Binding, &json!({"shape": "b", "anchor": [0.5, 1]})).unwrap();
     assert!(matches!(binding, Value::Binding(b) if b.anchor == [0.5, 1.0]));
     assert!(json::value("a", "x", Rule::Number, &json!("3")).is_err());

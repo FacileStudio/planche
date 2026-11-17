@@ -92,6 +92,7 @@ fn style(map: &HashMap<String, Any>) -> Result<Style, String> {
             "stroke" => style.stroke = text()?,
             "font" => style.font = text()?,
             "align" => style.align = text()?,
+            "valign" => style.valign = text()?,
             "width" => style.width = num()?,
             "size" => style.size = num()?,
             _ => return Err(format!("style has unknown key {key}")),

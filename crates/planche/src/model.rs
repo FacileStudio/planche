@@ -72,6 +72,8 @@ pub struct Style {
     pub size: Option<f64>,
     /// `align`.
     pub align: Option<String>,
+    /// `valign`, under the `full` profile only.
+    pub valign: Option<String>,
 }
 
 /// `{ shape, anchor }`.

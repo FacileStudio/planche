@@ -2,15 +2,20 @@
 
 use yrs::Any;
 
-use super::{number, string};
-use crate::{MAX_POINTS, MAX_TEXT};
+use super::{choice, number, string};
+use crate::{MAX_POINTS, MAX_TEXT, Profile};
 
-/// A plain object of `fill`, `stroke`, `width`, `font`, `size`, `align`.
-pub fn style(any: &Any) -> Result<(), String> {
+/// The values `style.valign` may hold under the `full` profile.
+const VALIGN: &[&str] = &["top", "middle", "bottom"];
+
+/// A plain object of `fill`, `stroke`, `width`, `font`, `size`, `align`, plus `valign` under
+/// the `full` profile.
+pub fn style(any: &Any, profile: Profile) -> Result<(), String> {
     let Any::Map(map) = any else { return Err("must be an object".to_owned()) };
     map.iter().try_for_each(|(key, value)| match key.as_str() {
         "fill" | "stroke" | "font" | "align" => string(value, MAX_TEXT).map_err(|e| format!("{key} {e}")),
         "width" | "size" => number(value).map(|_| ()).map_err(|e| format!("{key} {e}")),
+        "valign" if profile == Profile::Full => choice(value, VALIGN).map_err(|e| format!("{key} {e}")),
         _ => Err(format!("has an unknown key {key}")),
     })
 }

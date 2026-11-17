@@ -1,4 +1,4 @@
-import type { FullType, ShapeType } from './keys';
+import type { FullType, Profile, ShapeType } from './keys';
 
 /** Board schema version this client reads and writes (`docs/board-schema.md`). */
 export const SCHEMA = 1;
@@ -30,7 +30,9 @@ export type Style = {
 	width?: number;
 	font?: string;
 	size?: number;
-	align?: 'left' | 'center' | 'right';
+	align?: 'left' | 'center' | 'right' | 'justify';
+	/** Vertical placement of the text in its box, `full` profile only; absent is top. */
+	valign?: 'top' | 'middle' | 'bottom';
 };
 
 /** An arrow end bound to a shape: `anchor` is a fraction of the shape's box, `[0..1, 0..1]`. */
@@ -98,15 +100,21 @@ export function clampNumber(value: number): number {
 }
 
 const STYLE_STRINGS = ['fill', 'stroke', 'font'] as const;
+const ALIGN: Record<Profile, readonly string[]> = {
+	board: ['left', 'center', 'right'],
+	full: ['left', 'center', 'right', 'justify']
+};
+const VALIGN: readonly string[] = ['top', 'middle', 'bottom'];
 
-/** A style object the server accepts: known keys only, right types, nothing null or undefined. */
-export function cleanStyle(value: unknown): Style {
+/** A style object the server accepts under `profile` (board by default): known keys only, right types, nothing null or undefined. `full` also keeps `valign` and `align: 'justify'`. */
+export function cleanStyle(value: unknown, profile: Profile = 'board'): Style {
 	const raw = (value && typeof value === 'object' ? value : {}) as Record<string, unknown>;
 	const out: Style = {};
 	for (const key of STYLE_STRINGS) if (typeof raw[key] === 'string') out[key] = (raw[key] as string).slice(0, 10_000);
 	for (const key of ['width', 'size'] as const)
 		if (typeof raw[key] === 'number') out[key] = clampNumber(raw[key] as number);
-	if (raw.align === 'left' || raw.align === 'center' || raw.align === 'right') out.align = raw.align;
+	if (ALIGN[profile].includes(raw.align as string)) out.align = raw.align as Style['align'];
+	if (profile === 'full' && VALIGN.includes(raw.valign as string)) out.valign = raw.valign as Style['valign'];
 	return out;
 }
 

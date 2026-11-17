@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import fixture from '../../spec/fixtures/keys.json' with { type: 'json' };
-import { FULL_TYPES, SHAPE_TYPES, allowedKey, isShapeType, keys, positioned, type Profile } from './schema';
+import {
+	FULL_TYPES,
+	SHAPE_TYPES,
+	allowedKey,
+	cleanStyle,
+	isShapeType,
+	keys,
+	positioned,
+	type Profile
+} from './schema';
 
 type Row = { type: string; keys: string[]; positioned: boolean };
 
@@ -29,5 +38,20 @@ describe('profiles', () => {
 		expect(allowedKey('arrow', 'head')).toBe(true);
 		expect(allowedKey('line', 'head')).toBe(false);
 		expect(allowedKey('line', 'head', 'full')).toBe(false);
+	});
+});
+
+describe('cleanStyle', () => {
+	it('keeps valign and justify under full only', () => {
+		const style = { fill: '#fff', align: 'justify', valign: 'middle' };
+		expect(cleanStyle(style)).toEqual({ fill: '#fff' });
+		expect(cleanStyle(style, 'board')).toEqual({ fill: '#fff' });
+		expect(cleanStyle(style, 'full')).toEqual(style);
+		expect(cleanStyle({ align: 'center', valign: 'bottom' }, 'board')).toEqual({ align: 'center' });
+	});
+
+	it('drops bad align and valign values', () => {
+		expect(cleanStyle({ align: 'middle', valign: 'center' }, 'full')).toEqual({});
+		expect(cleanStyle({ valign: 1, align: 'Justify' }, 'full')).toEqual({});
 	});
 });

@@ -53,18 +53,18 @@ fn one(kind: &str, key: &str, value: &str, profile: Profile, out: &mut Attrs) ->
         return Ok(());
     }
     if let Some(field) = key.strip_prefix("style.")
-        && profile.rule(kind, "style").is_some()
+        && let Some(Rule::Style(fields)) = profile.rule(kind, "style")
     {
         if out.bare {
             return Err(MIXED.to_owned());
         }
-        return style(field, value, out.style.get_or_insert_with(Style::default));
+        return style(field, value, fields, out.style.get_or_insert_with(Style::default));
     }
     match profile.rule(kind, key) {
         None => Err(unknown(kind, key, profile)),
         Some(Rule::Plain | Rule::Text) => text(value, out),
         Some(Rule::Rich) => Err(format!("{key} is not an attribute; write it as a ```{key} fence first in the frame")),
-        Some(Rule::Style) => bare(value, out),
+        Some(Rule::Style(_)) => bare(value, out),
         Some(_) if key == "html" => Err("html is not an attribute; write it as the block body".to_owned()),
         Some(rule) => {
             out.fields.insert(key.to_owned(), read(rule, value)?);
@@ -107,14 +107,18 @@ fn text(value: &str, out: &mut Attrs) -> Result<(), String> {
     Ok(())
 }
 
-fn style(field: &str, value: &str, style: &mut Style) -> Result<(), String> {
+fn style(field: &str, value: &str, profile: Profile, style: &mut Style) -> Result<(), String> {
     match field {
         "fill" => style.fill = Some(value.to_owned()),
         "stroke" => style.stroke = Some(value.to_owned()),
         "font" => style.font = Some(value.to_owned()),
         "align" => style.align = Some(value.to_owned()),
+        "valign" if profile == Profile::Full => style.valign = Some(value.to_owned()),
         "width" => style.width = Some(scalars::number(value)?),
         "size" => style.size = Some(scalars::number(value)?),
+        _ if profile == Profile::Full => {
+            return Err(format!("style has no field {field}; fields: fill, stroke, width, font, size, align, valign"));
+        }
         _ => return Err(format!("style has no field {field}; fields: fill, stroke, width, font, size, align")),
     }
     Ok(())
@@ -130,7 +134,7 @@ fn read(rule: Rule, value: &str) -> Result<Value, String> {
         },
         Rule::Points(_) => Value::Points(scalars::points(value)?),
         Rule::Binding => Value::Binding(scalars::binding(value)?),
-        Rule::Str(_) | Rule::Choice(_) | Rule::Style | Rule::Plain | Rule::Text | Rule::Rich => {
+        Rule::Str(_) | Rule::Choice(_) | Rule::Style(_) | Rule::Plain | Rule::Text | Rule::Rich => {
             Value::Str(value.to_owned())
         }
     })

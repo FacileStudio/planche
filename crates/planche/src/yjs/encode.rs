@@ -43,7 +43,13 @@ fn any(value: &Value) -> Any {
 }
 
 fn style_any(style: &Style) -> Any {
-    let texts = [("fill", &style.fill), ("stroke", &style.stroke), ("font", &style.font), ("align", &style.align)];
+    let texts = [
+        ("fill", &style.fill),
+        ("stroke", &style.stroke),
+        ("font", &style.font),
+        ("align", &style.align),
+        ("valign", &style.valign),
+    ];
     let numbers = [("width", style.width), ("size", style.size)];
     let mut map: HashMap<String, Any> =
         texts.into_iter().filter_map(|(key, value)| Some((key.to_owned(), Any::from(value.as_deref()?)))).collect();

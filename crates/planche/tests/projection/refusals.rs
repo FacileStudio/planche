@@ -1,7 +1,7 @@
 //! The refusals of section 2.5, each at its line.
 
-use planche::Profile;
-use planche::projection::read;
+use planche::projection::{read, write};
+use planche::{Profile, Value};
 
 use super::support::refused;
 
@@ -56,4 +56,17 @@ fn the_reader_refuses_bad_attributes_with_their_line() {
 fn a_board_reader_refuses_rich_text() {
     let text = "---\nplanche: 1\n---\n\n```rect id=\"a\" x=\"0\" y=\"0\"\nhi\n```\n";
     assert_eq!(read(text, Profile::Board).unwrap_err().line, 5);
+}
+
+#[test]
+fn style_valign_is_read_under_full_only() {
+    let block =
+        |valign: &str| format!("{HEAD}```text id=\"a\" x=\"0\" y=\"0\" style.valign=\"{valign}\" text=\"none\"\n```\n");
+    let board = read(&block("middle"), Profile::Board).unwrap_err();
+    assert!(board.message.contains("style has no field valign"), "{}", board.message);
+    let document = read(&block("middle"), Profile::Full).unwrap();
+    let Value::Style(style) = &document.shapes["a"].fields["style"] else { panic!("no style") };
+    assert_eq!(style.valign.as_deref(), Some("middle"));
+    assert!(write(&document).contains("style.valign=\"middle\""));
+    assert_eq!(read(&block("center"), Profile::Full).unwrap_err().line, 5);
 }
