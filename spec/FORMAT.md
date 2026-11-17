@@ -248,5 +248,10 @@ room. The host keeps the document version, a number that increases on every acce
 
 ## 4. Compiling to HTML
 
-Reserved. Diapo's scene compiler takes a `full` document as its second input in phase 4 and
-keeps the `window.__scene` contract.
+Diapo's scene compiler (`facile-scene`, feature `planche`) compiles a `full` document and keeps
+the `window.__scene` contract: each top-level frame, by `order`, is one `layout: raw` scene; each
+child shape is one absolutely positioned element in frame pixels; `step` becomes `data-step`,
+`start` and `duration` become `data-start` and `data-duration`, and a frame's `notes` is the
+presenter note. The full mapping is the "Compiling" table of
+https://github.com/FacileStudio/Diapo/blob/main/docs/planche.md, and any other renderer of a
+`full` document (Diapo's editor stage) follows it.
