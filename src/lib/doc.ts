@@ -8,6 +8,8 @@ import {
 	cleanBinding,
 	cleanStyle,
 	isShapeType,
+	type FullType,
+	type Profile,
 	type Shape,
 	type ShapeFields,
 	type ShapeType
@@ -36,16 +38,24 @@ function clean(key: string, value: unknown): unknown {
 	return value;
 }
 
-/** Reads one shape's Y.Map into a plain snapshot, or null when it is not a schema 1 shape. */
-export function readShape(id: string, map: Y.Map<unknown>): Shape | null {
+/** Reads one shape's Y.Map into a plain snapshot, or null when `profile` (board by default) refuses its type. Rich text is left out. */
+export function readShape(id: string, map: Y.Map<unknown>): Shape | null;
+export function readShape(id: string, map: Y.Map<unknown>, profile: Profile): Shape<FullType> | null;
+export function readShape(id: string, map: Y.Map<unknown>, profile: Profile = 'board'): Shape<FullType> | null {
 	const type = map.get('type');
-	if (!isShapeType(type)) return null;
-	const shape: Shape = { id, type, x: 0, y: 0, w: 0, h: 0, rot: 0, z: '', style: {} };
+	if (!isShapeType(type, profile)) return null;
+	const shape: Shape<FullType> = { id, type, x: 0, y: 0, w: 0, h: 0, rot: 0, z: '', style: {} };
 	for (const [key, value] of map.entries()) {
-		if (value instanceof Y.Text) (shape as Record<string, unknown>)[key] = value.toString();
-		else if (value !== undefined) (shape as Record<string, unknown>)[key] = value;
+		if (value instanceof Y.XmlFragment || value === undefined) continue;
+		(shape as Record<string, unknown>)[key] = value instanceof Y.Text ? value.toString() : value;
 	}
 	return shape;
+}
+
+/** The rich text (`Y.XmlFragment`) under `key` of a shape's Y.Map, or undefined when it holds none. */
+export function richText(map: Y.Map<unknown>, key: string): Y.XmlFragment | undefined {
+	const value = map.get(key);
+	return value instanceof Y.XmlFragment ? value : undefined;
 }
 
 function unlink(map: Y.Map<unknown>, gone: Set<string>): void {

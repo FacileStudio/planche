@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import * as Y from 'yjs';
-import { BoardDoc, LOCAL } from './doc';
+import { BoardDoc, LOCAL, readShape, richText } from './doc';
 import { setText, splice } from './text';
 import { createUndo } from './undo';
 
@@ -144,5 +144,27 @@ describe('undo', () => {
 		doc.ydoc.on('afterTransaction', (tr: Y.Transaction) => origins.push(tr.origin));
 		doc.create('rect', { x: 0, y: 0, w: 1, h: 1, z: 'V' });
 		expect(origins).toEqual([LOCAL]);
+	});
+});
+
+describe('readShape', () => {
+	it('reads full types only under the full profile and leaves rich text out', () => {
+		const ydoc = new Y.Doc();
+		const map = ydoc.getMap<Y.Map<unknown>>('shapes');
+		const frame = new Y.Map<unknown>();
+		map.set('f', frame);
+		frame.set('type', 'frame');
+		frame.set('order', 'a0');
+		frame.set('notes', new Y.XmlFragment());
+		const video = new Y.Map<unknown>();
+		map.set('v', video);
+		video.set('type', 'video');
+		expect(readShape('v', video)).toBeNull();
+		expect(readShape('v', video, 'full')?.type).toBe('video');
+		const shape = readShape('f', frame, 'full');
+		expect(shape?.order).toBe('a0');
+		expect(shape && 'notes' in shape).toBe(false);
+		expect(richText(frame, 'notes')).toBeInstanceOf(Y.XmlFragment);
+		expect(richText(frame, 'order')).toBeUndefined();
 	});
 });

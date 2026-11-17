@@ -1,23 +1,12 @@
+import type { FullType, ShapeType } from './keys';
+
 /** Board schema version this client reads and writes (`docs/board-schema.md`). */
 export const SCHEMA = 1;
 
-/** Every shape type of schema 1. */
-export const SHAPE_TYPES = [
-	'sticky',
-	'text',
-	'rect',
-	'ellipse',
-	'diamond',
-	'line',
-	'arrow',
-	'ink',
-	'image',
-	'card',
-	'frame'
-] as const;
-
-/** A shape type of schema 1. */
-export type ShapeType = (typeof SHAPE_TYPES)[number];
+/** The profile key table (spec 1.2 to 1.5), kept in `keys.ts` and re-exported here. */
+export { COMMON_KEYS, FULL_TYPES, SHAPE_TYPES, allowedKey, isShapeType, keys, positioned } from './keys';
+/** The type and profile names of the key table. */
+export type { FullType, Profile, ShapeType } from './keys';
 
 /** The types whose label lives in a `text` Y.Text. */
 export const TEXT_TYPES: ReadonlySet<ShapeType> = new Set(['sticky', 'text', 'rect', 'ellipse', 'diamond']);
@@ -30,6 +19,7 @@ export const LIMITS = {
 	shapes: 20_000,
 	inkPoints: 10_000,
 	textChars: 10_000,
+	htmlChars: 100_000,
 	coordinate: 1e7
 } as const;
 
@@ -49,14 +39,17 @@ export type Binding = { shape: string; anchor: [number, number] };
 /** An arrow head setting. */
 export type Head = 'none' | 'end' | 'both';
 
+/** How a media shape fills its box. */
+export type Fit = 'cover' | 'contain' | 'fill';
+
 /**
  * A plain snapshot of one shape, read from its Y.Map. `x`, `y`, `w`, `h` are world units, `rot` is radians
  * around the box centre, `z` a fractional index. `points` are relative to `x`, `y`: `[x, y, pressure, ...]`
  * for ink, `[x, y, ...]` for lines and arrows.
  */
-export type Shape = {
+export type Shape<T extends FullType = ShapeType> = {
 	id: string;
-	type: ShapeType;
+	type: T;
 	x: number;
 	y: number;
 	w: number;
@@ -80,37 +73,23 @@ export type Shape = {
 	description?: string;
 	favicon?: string;
 	site?: string;
+	step?: number;
+	enter?: string;
+	start?: number;
+	duration?: number;
+	track?: number;
+	fit?: Fit;
+	opacity?: number;
+	order?: string;
+	layout?: string;
+	fixed_duration?: boolean;
+	media_in?: number;
+	volume?: number;
+	html?: string;
 };
 
 /** The fields a caller may set on a shape: everything but its id and its text. */
 export type ShapeFields = Omit<Partial<Shape>, 'id' | 'text'>;
-
-/** The keys every shape may carry, and the extra keys each type adds. */
-export const COMMON_KEYS = ['type', 'x', 'y', 'w', 'h', 'rot', 'z', 'parent', 'style', 'locked'] as const;
-
-const EXTRA_KEYS: Record<ShapeType, readonly string[]> = {
-	sticky: ['text'],
-	text: ['text'],
-	rect: ['text'],
-	ellipse: ['text'],
-	diamond: ['text'],
-	line: ['points', 'from', 'to'],
-	arrow: ['points', 'from', 'to', 'head'],
-	ink: ['points'],
-	image: ['asset'],
-	card: ['url', 'title', 'kind', 'image', 'description', 'favicon', 'site'],
-	frame: ['name']
-};
-
-/** Whether `key` is allowed on a shape of `type`. */
-export function allowedKey(type: ShapeType, key: string): boolean {
-	return (COMMON_KEYS as readonly string[]).includes(key) || EXTRA_KEYS[type].includes(key);
-}
-
-/** Whether `value` is a schema 1 shape type. */
-export function isShapeType(value: unknown): value is ShapeType {
-	return typeof value === 'string' && (SHAPE_TYPES as readonly string[]).includes(value);
-}
 
 /** Clamps a coordinate into the server's finite ±1e7 range; non-finite values become 0. */
 export function clampNumber(value: number): number {

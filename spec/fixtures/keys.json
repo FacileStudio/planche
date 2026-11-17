@@ -1,0 +1,31 @@
+{
+	"board": [
+		{"type": "sticky", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "text"], "positioned": true},
+		{"type": "text", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "text"], "positioned": true},
+		{"type": "rect", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "text"], "positioned": true},
+		{"type": "ellipse", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "text"], "positioned": true},
+		{"type": "diamond", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "text"], "positioned": true},
+		{"type": "line", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "points", "from", "to", "head"], "positioned": true},
+		{"type": "arrow", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "points", "from", "to", "head"], "positioned": true},
+		{"type": "ink", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "points"], "positioned": true},
+		{"type": "image", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "asset"], "positioned": true},
+		{"type": "card", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "url", "title", "kind", "image", "description", "favicon", "site"], "positioned": true},
+		{"type": "frame", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "name"], "positioned": true}
+	],
+	"full": [
+		{"type": "sticky", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "step", "enter", "start", "duration", "track", "fit", "opacity", "text"], "positioned": true},
+		{"type": "text", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "step", "enter", "start", "duration", "track", "fit", "opacity", "text"], "positioned": true},
+		{"type": "rect", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "step", "enter", "start", "duration", "track", "fit", "opacity", "text"], "positioned": true},
+		{"type": "ellipse", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "step", "enter", "start", "duration", "track", "fit", "opacity", "text"], "positioned": true},
+		{"type": "diamond", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "step", "enter", "start", "duration", "track", "fit", "opacity", "text"], "positioned": true},
+		{"type": "line", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "step", "enter", "start", "duration", "track", "fit", "opacity", "points", "from", "to", "head"], "positioned": true},
+		{"type": "arrow", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "step", "enter", "start", "duration", "track", "fit", "opacity", "points", "from", "to", "head"], "positioned": true},
+		{"type": "ink", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "step", "enter", "start", "duration", "track", "fit", "opacity", "points"], "positioned": true},
+		{"type": "image", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "step", "enter", "start", "duration", "track", "fit", "opacity", "asset"], "positioned": true},
+		{"type": "card", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "step", "enter", "start", "duration", "track", "fit", "opacity", "url", "title", "kind", "image", "description", "favicon", "site"], "positioned": true},
+		{"type": "frame", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "step", "enter", "start", "duration", "track", "fit", "opacity", "name", "order", "notes", "layout", "fixed_duration"], "positioned": true},
+		{"type": "video", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "step", "enter", "start", "duration", "track", "fit", "opacity", "asset", "media_in", "volume"], "positioned": true},
+		{"type": "audio", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "step", "enter", "start", "duration", "track", "fit", "opacity", "asset", "media_in", "volume"], "positioned": false},
+		{"type": "html", "keys": ["x", "y", "w", "h", "rot", "z", "parent", "style", "locked", "step", "enter", "start", "duration", "track", "fit", "opacity", "html"], "positioned": true}
+	]
+}

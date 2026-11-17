@@ -29,6 +29,10 @@ An app declares one profile, and its server refuses what the profile leaves out.
 A `board` document is a valid `full` document. The `board` profile exists so that Toile's
 server keeps refusing what it refused before planche.
 
+`spec/fixtures/keys.json` is the machine-readable key table: for each profile and type, the
+keys allowed beyond `type` in writing order, and whether the shape must hold `x` and `y`. The
+Rust crate and the TypeScript package each check their own table against it.
+
 ### 1.3 `meta`
 
 | Key | Profile | Value |
