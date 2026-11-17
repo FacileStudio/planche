@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-17
+
+### Added
+
+- `style.valign` under the `full` profile: `top`, `middle` or `bottom`, where a shape's text sits in its box. The validator refuses any other value, and `board` still refuses the key.
+- `style.align: "justify"` under the `full` profile. The TypeScript `cleanStyle(value, profile)` keeps `valign` and `justify` only for `full`; its default stays `board`.
+- The projection writes `style.valign` after `style.align`.
+
+### Changed
+
+- `Rule::Style` now carries the `Profile` whose style fields it allows (`Rule::Style(Profile)`), and `Style` gains a `valign` field.
+
 ## [0.2.0] - 2026-11-17
 
 ### Added
