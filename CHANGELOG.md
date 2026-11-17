@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-17
+
+### Added
+
+- The TypeScript package `@facile/planche`, used from a git tag: the schema with the `board` and `full` profiles, the Yjs document helpers, fractional indices, text splicing and undo, taken from Toile's client.
+- The canvas engine in TypeScript: camera, geometry, bounds, anchors, spatial index, snapping, transforms, hit testing, the scene read model and the tool contract, taken from Toile's client.
+- `spec/fixtures/keys.json`, the key table of both profiles, checked by the Rust and the TypeScript tests so the two cannot drift.
+
 ## [0.1.0] - 2026-11-16
 
 ### Added

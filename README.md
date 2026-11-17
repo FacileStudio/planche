@@ -10,11 +10,16 @@ Shapes on a canvas in a Yjs document, with frames as slides or scenes, and encre
 - Reads and writes the document as plain values
 - Projects the document as text and reads it back losslessly, for the CLI and agents
 - Plans agent operations that touch only the shapes they name
+- Gives browser apps the same schema, the Yjs helpers and the canvas engine in TypeScript
 
 ## Install
 
 ```toml
-planche = { git = "https://github.com/FacileStudio/planche", tag = "v0.1.0" }
+planche = { git = "https://github.com/FacileStudio/planche", tag = "v0.2.0" }
+```
+
+```json
+"@facile/planche": "github:FacileStudio/planche#v0.2.0"
 ```
 
 ## Develop
